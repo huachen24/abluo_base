@@ -171,10 +171,10 @@ if __name__ == '__main__':
         WHEEL_SEPARATION_WIDTH = rospy.get_param("/wheel/separation/horizontal")
         WHEEL_SEPARATION_LENGTH = rospy.get_param("/wheel/separation/vertical")
 
-        encoder_sub = rospy.Subscriber('encoder', Float32MultiArray, update) #READ FROM I2C INSTEAD, ADDITIONAL NODE FROM I2C TO TOPIC
+        encoder_sub = rospy.Subscriber('/encoder', Float32MultiArray, update) #READ FROM I2C INSTEAD, ADDITIONAL NODE FROM I2C TO TOPIC
 
-        joint_states_pub = rospy.Publisher('joint_states', JointState, queue_size=50)
-        odom_pub = rospy.Publisher('odom', Odometry, queue_size=50)
+        joint_states_pub = rospy.Publisher('/joint_states', JointState, queue_size=50)
+        odom_pub = rospy.Publisher('/odom', Odometry, queue_size=50)
 
         odom_broadcaster = tf.TransformBroadcaster()
 

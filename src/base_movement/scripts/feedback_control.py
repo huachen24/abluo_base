@@ -6,7 +6,7 @@ from std_msgs.msg import Float32MultiArray
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
 
-rospy.init_node('kinematic_controller', anonymous=True)
+rospy.init_node('kinematic_controller')
 
 
 class VelocityController():
