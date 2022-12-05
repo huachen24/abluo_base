@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import rospy
 import enum
+from std_msgs.msg import Float32MultiArray
 from tokenize import String
 import smbus2 as smbus
 import time
-
-rospy.init_node('encoder_api')
 
 class abluoEncodersApi:
     def __init__(self, i2cBus, i2cAddress, **kwargs):
@@ -17,6 +16,7 @@ class abluoEncodersApi:
         """
         self._i2cBus = i2cBus
         self._i2cAddress = i2cAddress
+        rospy.init_node('encoder_api')
         self.encoder_pub = rospy.Publisher("encoder", Float32MultiArray, queue_size=10)
         rate = rospy.Rate(1000)
         while not rospy.is_shutdown():

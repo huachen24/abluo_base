@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 import rospy
 import enum
+from std_msgs.msg import Float32MultiArray
 from tokenize import String
 import smbus2 as smbus
 import time
 
-rospy.init_node('wheel_api')
-
-class abluoWheels:
+class abluoWheelsApi:
     class WHEEL_INDEX():
         FRONT_LEFT = 0
         FRONT_RIGHT = 1
@@ -27,7 +26,9 @@ class abluoWheels:
         """
         self._i2cBus = i2cBus
         self._i2cAddress = i2cAddress
+        rospy.init_node('wheel_api')
         self.subscribe()
+        rospy.spin()
 
     def sendCommand(self, msg):
         payload = "{},{},{},{}\n".format(msg[0], msg[1], msg[2], msg[3])
