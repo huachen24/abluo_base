@@ -469,12 +469,12 @@ void loop()
     {
       processNewData();
       pwmMotorsController.handlePWM();
-      getEncoderData();
+      //getEncoderData();
     }
     else
     {
       parseInput();
-      getEncoderData();
+      //getEncoderData();
     }
   }
 }

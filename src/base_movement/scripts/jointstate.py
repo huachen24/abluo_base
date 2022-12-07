@@ -53,10 +53,16 @@ def publish_joint_state(encoder, new_time):
         'base_link_to_wheel_rear_right'
     ]
 
-    new_ticks_front_left = encoder.front_left
-    new_ticks_front_right = encoder.front_right
-    new_ticks_rear_left = encoder.rear_left
-    new_ticks_rear_right = encoder.rear_right
+    # new_ticks_front_left = encoder.front_left
+    # new_ticks_front_right = encoder.front_right
+    # new_ticks_rear_left = encoder.rear_left
+    # new_ticks_rear_right = encoder.rear_right
+
+    # test
+    new_ticks_front_left = encoder.data[0]
+    new_ticks_front_right = encoder.data[1]
+    new_ticks_rear_left = encoder.data[2]
+    new_ticks_rear_right = encoder.data[3]
 
 
 
@@ -153,9 +159,9 @@ def update(encoder):
     delta_y = (vx * sin(th) + vy * cos(th)) * dt
     delta_th = vth * dt
 
-    x += delta_x;
-    y += delta_y;
-    th += delta_th;
+    x += delta_x
+    y += delta_y
+    th += delta_th
 
     broadcast_transform(x, y, th, new_time)
     publish_odom(x, y, th, vx, vy, vth, new_time)
@@ -164,12 +170,18 @@ def update(encoder):
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('encoder_to_jointstate')
+        rospy.init_node('jointstate_node')
 
-        ENCODER_TICKS_PER_REV = rospy.get_param("/encoder/ticks_per_rev")
-        WHEEL_RADIUS = rospy.get_param("/wheel/diameter") / 2
-        WHEEL_SEPARATION_WIDTH = rospy.get_param("/wheel/separation/horizontal")
-        WHEEL_SEPARATION_LENGTH = rospy.get_param("/wheel/separation/vertical")
+        # ENCODER_TICKS_PER_REV = rospy.get_param("/encoder/ticks_per_rev")
+        # WHEEL_RADIUS = rospy.get_param("/wheel/diameter") / 2
+        # WHEEL_SEPARATION_WIDTH = rospy.get_param("/wheel/separation/horizontal")
+        # WHEEL_SEPARATION_LENGTH = rospy.get_param("/wheel/separation/vertical")
+        
+        # RANDOM VALUES FOR TESTING
+        ENCODER_TICKS_PER_REV = 8000
+        WHEEL_RADIUS = 10
+        WHEEL_SEPARATION_WIDTH = 20
+        WHEEL_SEPARATION_LENGTH = 30
 
         encoder_sub = rospy.Subscriber('/encoder', Float32MultiArray, update) #READ FROM I2C INSTEAD, ADDITIONAL NODE FROM I2C TO TOPIC
 
