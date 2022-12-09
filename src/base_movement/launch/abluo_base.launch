@@ -17,9 +17,9 @@
   <!-- Spawn Model -->
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model robot_base" />
 
-  <node name="kinematics" pkg="base_movement" type="kinematics_controller.py" />
+  <!--node name="kinematics" pkg="base_movement" type="kinematics_controller.py" /-->
 
-  <node name="joints" pkg="base_movement" type="jointstate.py" />
+  <!--node name="joints" pkg="base_movement" type="jointstate.py" /-->
 
 
 </launch>

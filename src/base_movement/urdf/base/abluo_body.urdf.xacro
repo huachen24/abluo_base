@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot name="abluo_base_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="abluo_base">
+
+    <!-- Robot mechanical and motor parameters -->
+    <xacro:property name="PI" value="3.1415926535897931" />
+
+    <!-- BASE FOOTPRINT -->
+    <link name="base_footprint" />
+
+    <joint name="abluo_base_footprint_joint" type="fixed">
+      <origin xyz="0 0 0.0" rpy="0 0 0" /> <!-- ${wheel_radius} property must be defined inside wheel description -->
+      <parent link="base_footprint" />
+      <child link="abluo_base_link" />
+    </joint>
+
+    <!-- BASE_LINK -->
+    <link name="abluo_base_link">
+      <gravity>1</gravity>
+      <inertial>
+        <origin xyz="0 0 0.28249998" rpy="0 0 0" />
+        <mass value="80" />
+        <inertia ixx="0.00611005" ixy="0" ixz="0" iyy="0.00494495" iyz="0.0" izz="0.00494495" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0.02" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://abluo_base_description/meshes/base_link.STL" />
+        </geometry>
+        <material name="custom">
+          <color rgba="0.79216 0.81961 0.93333 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.02" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://abluo_base_description/meshes/base_link.STL" />
+        </geometry>
+      </collision>
+    </link>
+
+  </xacro:macro>
+
+</robot>

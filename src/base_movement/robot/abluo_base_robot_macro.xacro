@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="abluo_robot">
+	<xacro:macro name="abluo_base_vehicle">
+		<!-- Import summit XL wheels -->
+		<xacro:include filename="$(find base_movement)/urdf/wheels/omni_wheel.urdf.xacro" />
+		<xacro:include filename="$(find base_movement)/urdf/base/abluo_body.urdf.xacro" />
+		<!-- Include Gazebo Plugins -->
+		<xacro:include filename="$(find base_movement)/urdf/base/abluo_body.gazebo.xacro" />
+		<!-- Include Sensors -->
+		<xacro:include filename="$(find base_movement)/urdf/sensors/rplidar.gazebo.xacro" />
+
+		<!-- Wheel parameters -->
+		<xacro:property name="wheel_offset_x" value="0.2" /> <!-- x,y,z in translation from base_link to the center of the wheel -->
+		<xacro:property name="wheel_offset_y" value="0.2028" />
+		<xacro:property name="wheel_offset_z" value="${wheel_radius}" />
+
+		<!-- Sensor parameters -->
+		<!-- <xacro:property name="rplidar_parent_link" value="abluo_base_link"/> -->
+		<xacro:macro name="robot_wheels">
+			<xacro:abluo_base />
+
+			<xacro:omni_wheel prefix="abluo_front_right" parent="abluo_base_link" reflect="false">
+				<origin xyz="${wheel_offset_x} ${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0" />
+			</xacro:omni_wheel>
+
+			<xacro:omni_wheel prefix="abluo_front_left" parent="abluo_base_link" reflect="true">
+				<origin xyz="-${wheel_offset_x} ${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0" />
+			</xacro:omni_wheel>
+
+			<xacro:omni_wheel prefix="abluo_back_left" parent="abluo_base_link" reflect="false">
+				<origin xyz="${wheel_offset_x} -${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0" />
+			</xacro:omni_wheel>
+
+			<xacro:omni_wheel prefix="abluo_back_right" parent="abluo_base_link" reflect="true">
+				<origin xyz="-${wheel_offset_x} -${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0" />
+			</xacro:omni_wheel>
+
+			<xacro:omni_steering />
+
+			<xacro:sensor_rplidar rplidar_parent_link="abluo_base_link">
+				<origin xyz="0 0 0" rpy="0 0 0" />
+			</xacro:sensor_rplidar>
+			<xacro:sensor_realsense realsense_parent_link="abluo_base_link">
+				<origin xyz="0 0 -0.01" rpy="0 0 0" />
+			</xacro:sensor_realsense>
+		</xacro:macro>
+		<xacro:robot_wheels/>
+	</xacro:macro>
+</robot>
