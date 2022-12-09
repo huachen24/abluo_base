@@ -12,8 +12,7 @@ class abluoWheels:
         self._i2cBus = i2cBus
         self._i2cAddress = i2cAddress
 
-    def sendCommand(self, msg):
-        vel = msg.data
+    def sendCommand(self, vel):
         vel = [round(i, 2) for i in vel]
         payload = "{:07.2f},{:07.2f},{:07.2f},{:07.2f}\n".format(vel[0], vel[1], vel[2], vel[3])
         payload_byte = []
