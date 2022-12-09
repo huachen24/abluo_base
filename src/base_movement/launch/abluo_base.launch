@@ -1,25 +1,22 @@
-<?xml version="1.0"?>
 <launch>
+    <node name="wheel_node" pkg="base_movement" type="wheel_node.py" output="screen">
+        <param name="i2c/bus" type="int" value="0" />
+        <param name="i2c/addr" value="0x70" />
+    </node>
 
-  <!-- Load the URDF into the ROS parameter server -->
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find base_movement)/robot/abluo_base.urdf.xacro'" />
+    <node name="encoder_node" pkg="base_movement" type="encoder_node.py" output="screen">
+        <param name="i2c/bus" type="int" value="0" />
+        <param name="i2c/addr" value="0x70" />
+        <param name="freq" type="double" value="1.0" />
+    </node>
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+    <node name="transform" pkg="base_movement" type="jointstate.py" output="screen">
+        <param name="encoder/ticks_per_rev" type="int" value="5000" />
+        <param name="wheel/diameter" type="double" value="5.0" />
+        <param name="wheel/separation/horizontal" type="double" value="10.0" />
+        <param name="wheel/separation/vertical" type="double" value="20.0" />
+    </node>
 
-  <!-- Publish joint values -->
-  <!--node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />-->
-
-
-  <!-- Convert joint states to TF transforms for rviz, etc -->
-  <!--node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />-->
-
-  <!-- Spawn Model -->
-  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model robot_base" />
-
-  <!--node name="kinematics" pkg="base_movement" type="kinematics_controller.py" /-->
-
-  <!--node name="joints" pkg="base_movement" type="jointstate.py" /-->
-
-
+    <node name="kinematics" pkg="base_movement" type="kinematics_controller.py" required="true" output="screen">
+    </node>
 </launch>

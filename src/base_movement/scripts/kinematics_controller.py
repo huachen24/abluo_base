@@ -5,6 +5,7 @@ import numpy as np
 from std_msgs.msg import Float32MultiArray
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
+import matplotlib.pyplot as plt
 
 
 class VelocityController():
@@ -13,8 +14,8 @@ class VelocityController():
         rospy.sleep(0.1)
 
     def velocity2twist(self, dx, dy, dtheta, thetac):
-        H = np.array([[np.cos(thetac), -np.sin(thetac), 0],
-                    [np.sin(thetac), np.cos(thetac), 0],
+        H = np.array([[np.cos(thetac), np.sin(thetac), 0],
+                    [-np.sin(thetac), np.cos(thetac), 0],
                     [0, 0, 1]])
         velocity = np.array([dx, dy, dtheta])
         velocity.shape = (3, 1)
@@ -22,10 +23,10 @@ class VelocityController():
         vx, vy, wz = twist.flatten().tolist()
         return vx, vy, wz
 
-    def twist2wheels(self, wz, vx, vy):
-        l = 0.500/2
-        w = 0.548/2
-        r = 0.254/2
+    def twist2wheels(self, vx, vy, wz):
+        l = 0.2/2
+        w = 0.1/2
+        r = 0.05/2
         H = np.array([[1, -1, -w-l],
                     [1, 1, w+l],
                     [1, 1, -w-l],
@@ -41,12 +42,14 @@ class VelocityController():
         msg = Float32MultiArray(data=u)
         self.vel_pub.publish(msg)
 
-    def go_to(self, xg, yg, thetag_degrees, odom, constant_vel=0.3):
+    def go_to(self, xg, yg, thetag_degrees, odom):
         rho = float("inf")
+        dtheta = 5.0
         not_moving_counter = 0
         thetag = math.radians(thetag_degrees)
-        while rho > 0.01:
+        while rho > 0.05 or dtheta < -0.2 or dtheta > 0.2:
             old_rho = rho
+            old_dtheta = dtheta
             xc = odom.odom_pose['x']
             yc = odom.odom_pose['y']
             thetac = odom.odom_pose['theta']
@@ -55,12 +58,15 @@ class VelocityController():
             rho = np.sqrt(dx**2 + dy**2)
             dtheta = normalize(thetag - thetac)
             velocity.move(dx, dy, dtheta, thetac)
-            if old_rho == rho:
+            if old_rho == rho and old_dtheta == dtheta:
                 not_moving_counter += 1
-            if not_moving_counter >= 3:
+            else: 
+                not_moving_counter = 0
+            if not_moving_counter >= 50:
                 print("Robot not moving. May be stuck. ")
                 break
             rospy.sleep(0.01)
+        velocity.move(0, 0, 0, 0)
 
 
 class OdometryReader():
@@ -78,16 +84,27 @@ class OdometryReader():
                                                                  msg.pose.pose.orientation.y,
                                                                  msg.pose.pose.orientation.z,
                                                                  msg.pose.pose.orientation.w])
+        print(self.odom_pose)
 
     def subscribe(self):
         self.odom_subscriber = rospy.Subscriber(
             self.topic, Odometry, self.callback)
         rospy.sleep(0.1)
 
+    def unregister(self):
+        self.odom_subscriber.unregister()
+
 
 def normalize(angle):
     return np.arctan2(np.sin(angle), np.cos(angle))
 
+def sign(number):
+    if number > 0:
+        return 1
+    elif number < 0:
+        return -1
+    else:
+        return 0
 
 if __name__ == "__main__":
     try:
@@ -96,15 +113,23 @@ if __name__ == "__main__":
         odometry = OdometryReader('/odom')
 
         #testing waypoints
-        waypoints = [(1, -1, 0), (0, 0, 180)]
+        waypoints = [(0, 0, 180)]
+        i=0
 
         for xg, yg, thetag in waypoints:
-            velocity.go_to(xg, yg, thetag, odometry, constant_vel=0.3)
+            i += 1
+            print("waypoint %d" % i)
+            velocity.go_to(xg, yg, thetag, odometry)
 
         velocity.move(0, 0, 0, 0) #stop
+        odometry.unregister()
 
         # Errors
         error = math.hypot(odometry.odom_pose['x'], odometry.odom_pose['y'])
         print('Final positioning error is %.2fm' % error)
+        xs = [x[0] for x in odometry.trajectory]
+        ys = [x[1] for x in odometry.trajectory]
+        plt.plot(xs, ys)
+        plt.show()
     except rospy.ROSInterruptException:
         pass

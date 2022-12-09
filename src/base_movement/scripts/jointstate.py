@@ -2,7 +2,7 @@
 
 import rospy
 import tf
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, PoseWithCovarianceStamped
@@ -172,18 +172,12 @@ if __name__ == '__main__':
     try:
         rospy.init_node('jointstate_node')
 
-        # ENCODER_TICKS_PER_REV = rospy.get_param("/encoder/ticks_per_rev")
-        # WHEEL_RADIUS = rospy.get_param("/wheel/diameter") / 2
-        # WHEEL_SEPARATION_WIDTH = rospy.get_param("/wheel/separation/horizontal")
-        # WHEEL_SEPARATION_LENGTH = rospy.get_param("/wheel/separation/vertical")
-        
-        # RANDOM VALUES FOR TESTING
-        ENCODER_TICKS_PER_REV = 8000
-        WHEEL_RADIUS = 10
-        WHEEL_SEPARATION_WIDTH = 20
-        WHEEL_SEPARATION_LENGTH = 30
+        ENCODER_TICKS_PER_REV = rospy.get_param("~encoder/ticks_per_rev")
+        WHEEL_RADIUS = rospy.get_param("~wheel/diameter") / 2
+        WHEEL_SEPARATION_WIDTH = rospy.get_param("~wheel/separation/horizontal")
+        WHEEL_SEPARATION_LENGTH = rospy.get_param("~wheel/separation/vertical")
 
-        encoder_sub = rospy.Subscriber('/encoder', Float32MultiArray, update) #READ FROM I2C INSTEAD, ADDITIONAL NODE FROM I2C TO TOPIC
+        encoder_sub = rospy.Subscriber('/encoder', Int32MultiArray, update) #READ FROM I2C INSTEAD, ADDITIONAL NODE FROM I2C TO TOPIC
 
         joint_states_pub = rospy.Publisher('/joint_states', JointState, queue_size=50)
         odom_pub = rospy.Publisher('/odom', Odometry, queue_size=50)
