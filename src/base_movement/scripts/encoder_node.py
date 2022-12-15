@@ -17,9 +17,7 @@ class EncoderROSWrapper:
             msg = Int32MultiArray(data=self.encoders.readEncoders())
             self.encoder_pub.publish(msg)
         except Exception as e:
-            print(e)
-            print(self.encoders.readEncoders())
-            # print("Cannot read encoders. Check I2C connection.")
+            print("Cannot read encoders. Check I2C connection.")
 
 if __name__ == "__main__":
     rospy.init_node('encoder_node')
