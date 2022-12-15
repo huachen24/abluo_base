@@ -13,17 +13,13 @@ class abluoWheels:
         self._i2cAddress = i2cAddress
 
     def sendCommand(self, vel):
-        vel = [round(i, 2) for i in vel]
-        payload = "{:07.2f},{:07.2f},{:07.2f},{:07.2f}\n".format(vel[0], vel[1], vel[2], vel[3])
+        vel = [int(i) for i in vel]
+        payload = "{:03d},{:03d},{:03d},{:03d}\n".format(vel[0], vel[1], vel[2], vel[3])
         payload_byte = []
         for c in payload:
             payload_byte.append(ord(c))
-        try:
-            wire = smbus.SMBus(self._i2cBus)
-            wire.write_i2c_block_data(self._i2cAddress, 0x0, payload_byte)
-        except IOError:
-            # Emergency stop handling
-            print("Wheel microcontroller not detected")
+        wire = smbus.SMBus(self._i2cBus)
+        wire.write_i2c_block_data(self._i2cAddress, 0x00, payload_byte)
 
 class abluoEncoders:
     def __init__(self, i2cBus, i2cAddress, **kwargs):
@@ -38,10 +34,9 @@ class abluoEncoders:
 
     def readEncoders(self):
         with smbus.SMBus(self._i2cBus) as wire:
-            read = smbus.i2c_msg.read(self._i2cAddress, 31)
-            wire.i2c_rdwr(read)
+            read = wire.read_i2c_block_data(self._i2cAddress, 0x00, 31)
         spdbytes = list(read)
-        spdstring = bytes(spdbytes).decode('ascii')
+        spdstring = bytearray(spdbytes).decode("ascii")
         velocities = spdstring[1:].split(',')
-        velocities = [float(vel) for vel in velocities]
+        velocities = [int(vel) for vel in velocities]
         return velocities

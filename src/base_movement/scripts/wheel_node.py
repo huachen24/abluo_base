@@ -19,5 +19,4 @@ class WheelROSWrapper:
 if __name__ == "__main__":
     rospy.init_node('wheel_node')
     wheel_wrapper = WheelROSWrapper()
-    rospy.on_shutdown(wheel_wrapper.stop)
     rospy.spin()

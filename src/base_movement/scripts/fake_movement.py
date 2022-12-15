@@ -23,7 +23,7 @@ class FakeMovement:
     def convert_vel2enc(self, msg):
         vel = msg.data
         for i in range(len(vel)):
-            self.encoder_data[i] += int(vel[i] * 0.01 / 0.05 / 3.14159265 * 5000)
+            self.encoder_data[i] += int(vel[i] * 0.01 / 0.05 / 3.14159265 * 500)
 
 if __name__ == "__main__":
     rospy.init_node('fake_node')

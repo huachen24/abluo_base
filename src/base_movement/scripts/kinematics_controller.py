@@ -24,9 +24,9 @@ class VelocityController():
         return vx, vy, wz
 
     def twist2wheels(self, vx, vy, wz):
-        l = 0.2/2
-        w = 0.1/2
-        r = 0.05/2
+        l = 0.163/2
+        w = 0.215/2
+        r = 0.08/2
         H = np.array([[1, -1, -w-l],
                     [1, 1, w+l],
                     [1, 1, -w-l],
@@ -84,7 +84,6 @@ class OdometryReader():
                                                                  msg.pose.pose.orientation.y,
                                                                  msg.pose.pose.orientation.z,
                                                                  msg.pose.pose.orientation.w])
-        print(self.odom_pose)
 
     def subscribe(self):
         self.odom_subscriber = rospy.Subscriber(
@@ -113,7 +112,7 @@ if __name__ == "__main__":
         odometry = OdometryReader('/odom')
 
         #testing waypoints
-        waypoints = [(0, 0, 180)]
+        waypoints = [(0, 0, 90)]
         i=0
 
         for xg, yg, thetag in waypoints:
@@ -132,4 +131,4 @@ if __name__ == "__main__":
         plt.plot(xs, ys)
         plt.show()
     except rospy.ROSInterruptException:
-        pass
+        velocity.move(0, 0, 0, 0) #stop
