@@ -17,7 +17,7 @@ extern char speedChars[];
 static char *input;
 static char *token;
 extern void receiveEvent(int numChar);
-extern void requestEvent();
+// extern void requestEvent();
 extern void parseInput();
 
 #endif

@@ -26,25 +26,25 @@
 
 // Back Left Wheel - DC Controller 2 Motor 1
 #define BL_EN 60
-#define BL_IN1 61
-#define BL_IN2 62
+#define BL_IN1 62
+#define BL_IN2 61
 
 // Back Right Wheel - DC Controller 2 Motor 2
 #define BR_EN 63
 #define BR_IN1 64
 #define BR_IN2 65
 
-#define ESTOP_INT 3
+#define ESTOP_INT 10
 
 // Encoder input pins (only 1 needs to be interrupt)
-#define ENC_FL_A 2
-#define ENC_FL_B 3
+#define ENC_FL_A 3
+#define ENC_FL_B 2
 
 #define ENC_FR_A 4
 #define ENC_FR_B 5
 
-#define ENC_BL_A 6
-#define ENC_BL_B 7
+#define ENC_BL_A 7
+#define ENC_BL_B 6
 
 #define ENC_BR_A 8
 #define ENC_BR_B 9
@@ -74,6 +74,10 @@ volatile int posFL = 0;
 volatile int posFR = 0;
 volatile int posBL = 0;
 volatile int posBR = 0;
+char padded_FL[8];
+char padded_FR[8];
+char padded_BL[8];
+char padded_BR[8];
 long prevT = 0;
 float ang_vel_FL = 0;
 float ang_vel_FR = 0;
@@ -332,19 +336,19 @@ void handleCommand()
   int blPWM = payload[2];
   int brPWM = payload[3];
   if (flPWM < 0 ) {
-    int flDIR = 0;
+    flDIR = 0;
     flPWM = -flPWM;
   }
   if (frPWM < 0 ) {
-    int frDIR = 0;
+    frDIR = 0;
     frPWM = -frPWM;
   }
   if (blPWM < 0 ) {
-    int blDIR = 0;
+    blDIR = 0;
     blPWM = -blPWM;
   }
   if (brPWM < 0 ) {
-    int brDIR = 0;
+    brDIR = 0;
     brPWM = -brPWM;
   }
   updateDcMotorState(WHEELS_INDEX::FRONT_LEFT, 1, flDIR, flPWM, set_FL_Forward, set_FL_Backward, brake_FL);
@@ -413,6 +417,29 @@ void getEncoderData() {
   }
 }
 
+void requestEvent()
+{
+  dtostrf(posFL, 7, 0, padded_FL);
+  strcat(speedChars, padded_FL);
+  strcat(speedChars, ",");
+  dtostrf(posFR, 7, 0, padded_FR);
+  strcat(speedChars, padded_FR);
+  strcat(speedChars, ",");
+  dtostrf(posBL, 7, 0, padded_BL);
+  strcat(speedChars, padded_BL);
+  strcat(speedChars, ",");
+  dtostrf(posBR, 7, 0, padded_BR);
+  strcat(speedChars, padded_BR);
+  
+  speedChars[0] = 0;
+  Wire.write(speedChars, 32);
+  // posFL = 0;
+  // posFR = 0;
+  // posBL = 0;
+  // posBR = 0;
+
+}
+
 void emergencyStop()
 {
   unsigned long interrupt_time = millis();
@@ -468,6 +495,15 @@ void loop()
     if (!emergency)
     {
       processNewData();
+      // payload[0] = 30;
+      // payload[1] = 30;
+      // payload[2] = 30;
+      // payload[3] = 30;
+      // handleCommand();
+      // updateDcMotorState(WHEELS_INDEX::FRONT_LEFT, 1, 0, 50, set_FL_Forward, set_FL_Backward, brake_FL);
+      // updateDcMotorState(WHEELS_INDEX::FRONT_RIGHT, 1, 0, 50, set_FR_Forward, set_FR_Backward, brake_FR);
+      // updateDcMotorState(WHEELS_INDEX::BACK_LEFT, 1, 0, 50, set_BL_Forward, set_BL_Backward, brake_BL);
+      // updateDcMotorState(WHEELS_INDEX::BACK_RIGHT, 1, 0, 50, set_BR_Forward, set_BR_Backward, brake_BR);
       pwmMotorsController.handlePWM();
       //getEncoderData();
     }
