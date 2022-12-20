@@ -9,7 +9,7 @@ namespace LibWireConstants
     const byte numInputs = 4;
 }
 
-extern boolean newData;
+extern bool newData;
 extern int payload[];
 extern char receivedChars[];
 extern char speedChars[];

@@ -16,23 +16,23 @@
 
 // Front Left Wheel - DC Controller 1 Motor 1
 #define FL_EN 54
-#define FL_IN1 55
-#define FL_IN2 56
+#define FL_IN1 56
+#define FL_IN2 55
 
 // Front Right Wheel - DC Controller 1 Motor 2
 #define FR_EN 57
-#define FR_IN1 58
-#define FR_IN2 59
+#define FR_IN1 59
+#define FR_IN2 58
 
 // Back Left Wheel - DC Controller 2 Motor 1
 #define BL_EN 60
-#define BL_IN1 62
-#define BL_IN2 61
+#define BL_IN1 61
+#define BL_IN2 62
 
 // Back Right Wheel - DC Controller 2 Motor 2
 #define BR_EN 63
-#define BR_IN1 64
-#define BR_IN2 65
+#define BR_IN1 65
+#define BR_IN2 64
 
 #define ESTOP_INT 10
 
@@ -495,6 +495,7 @@ void loop()
     if (!emergency)
     {
       processNewData();
+      pwmMotorsController.handlePWM();
       // payload[0] = 30;
       // payload[1] = 30;
       // payload[2] = 30;
@@ -504,13 +505,12 @@ void loop()
       // updateDcMotorState(WHEELS_INDEX::FRONT_RIGHT, 1, 0, 50, set_FR_Forward, set_FR_Backward, brake_FR);
       // updateDcMotorState(WHEELS_INDEX::BACK_LEFT, 1, 0, 50, set_BL_Forward, set_BL_Backward, brake_BL);
       // updateDcMotorState(WHEELS_INDEX::BACK_RIGHT, 1, 0, 50, set_BR_Forward, set_BR_Backward, brake_BR);
-      pwmMotorsController.handlePWM();
-      //getEncoderData();
+      // getEncoderData();
     }
     else
     {
       parseInput();
-      //getEncoderData();
+      // getEncoderData();
     }
   }
 }

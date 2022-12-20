@@ -29,9 +29,9 @@ void PWM_PROCESSING::init(int microInterval, int pwmMax, const byte *pwmPins, co
 void PWM_PROCESSING::handlePWM()
 {
     unsigned long currentMicros = micros();
-    if (currentMicros - previousMicros >= microInterval)
+    if (currentMicros - this->previousMicros >= this->microInterval)
     {
-        for (int index = 0; index < pwmPinCount; index++)
+        for (int index = 0; index < this->pwmPinCount; index++)
         {
             myPWMpinsArray[index].pwmTickCount++;
             if (myPWMpinsArray[index].pinState == ON)
@@ -51,7 +51,7 @@ void PWM_PROCESSING::handlePWM()
             }
             digitalWrite(myPWMpinsArray[index].pin, myPWMpinsArray[index].pinState);
         }
-        previousMicros = currentMicros;
+        this->previousMicros = currentMicros;
     }
 }
 

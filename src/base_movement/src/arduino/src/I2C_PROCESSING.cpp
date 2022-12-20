@@ -10,22 +10,22 @@ char speedChars[numChars];
 // char padded_BL[8];
 // char padded_BR[8];
 int payload[numInputs];
-boolean newData = false;
+bool newData = false;
 
 void receiveEvent(int numChar) {
-    static byte idx = 0;
-    Wire.read();
-    while (Wire.available()) {
-      rc = Wire.read();
-      if (rc != '\n') {
-        receivedChars[idx] = rc;
-        idx++;
-      } else {
-        receivedChars[idx] = '\0';
-        idx = 0;
-      }
+  static byte idx = 0;
+  Wire.read();
+  while (Wire.available()) {
+    rc = Wire.read();
+    if (rc != '\n') {
+      receivedChars[idx] = rc;
+      idx++;
+    } else {
+      receivedChars[idx] = '\0';
+      idx = 0;
     }
-    newData = true;
+  }
+  newData = true;
 }
 
 // void requestEvent()
@@ -53,12 +53,12 @@ void receiveEvent(int numChar) {
 
 void parseInput()
 {
-    input = receivedChars;
-    newData = false;
-    int counter = 0;
-    while ((token = strtok_r(input, ",", &input)))
-    {
-        payload[counter] = atoi(token);
-        counter++;
-    }
+  input = receivedChars;
+  newData = false;
+  int counter = 0;
+  while ((token = strtok_r(input, ",", &input)))
+  {
+    payload[counter] = atoi(token);
+    counter++;
+  }
 }
