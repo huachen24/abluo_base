@@ -39,6 +39,8 @@ class VelocityController():
     def move(self, dx, dy, dtheta, thetac):
         vx, vy, wz = self.velocity2twist(dx, dy, dtheta, thetac)
         u = self.twist2wheels(vx, vy, wz)
+        u = [i*5 for i in u]
+        print(u)
         msg = Float32MultiArray(data=u)
         self.vel_pub.publish(msg)
 
@@ -84,6 +86,7 @@ class OdometryReader():
                                                                  msg.pose.pose.orientation.y,
                                                                  msg.pose.pose.orientation.z,
                                                                  msg.pose.pose.orientation.w])
+        print(self.odom_pose)
 
     def subscribe(self):
         self.odom_subscriber = rospy.Subscriber(
@@ -126,9 +129,9 @@ if __name__ == "__main__":
         # Errors
         error = math.hypot(odometry.odom_pose['x'], odometry.odom_pose['y'])
         print('Final positioning error is %.2fm' % error)
-        xs = [x[0] for x in odometry.trajectory]
-        ys = [x[1] for x in odometry.trajectory]
-        plt.plot(xs, ys)
-        plt.show()
+        #xs = [x[0] for x in odometry.trajectory]
+        #ys = [x[1] for x in odometry.trajectory]
+        #plt.plot(xs, ys)
+        #plt.show()
     except rospy.ROSInterruptException:
         velocity.move(0, 0, 0, 0) #stop

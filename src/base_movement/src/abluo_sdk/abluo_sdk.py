@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import smbus2 as smbus
+import time
 
 class abluoWheels:
     def __init__(self, i2cBus, i2cAddress, **kwargs):
@@ -11,6 +12,8 @@ class abluoWheels:
         """
         self._i2cBus = i2cBus
         self._i2cAddress = i2cAddress
+        self.wire = smbus.SMBus(i2cBus)
+        time.sleep(1)
 
     def sendCommand(self, vel):
         vel = [int(i) for i in vel]
@@ -18,8 +21,7 @@ class abluoWheels:
         payload_byte = []
         for c in payload:
             payload_byte.append(ord(c))
-        wire = smbus.SMBus(self._i2cBus)
-        wire.write_i2c_block_data(self._i2cAddress, 0x00, payload_byte)
+        self.wire.write_i2c_block_data(self._i2cAddress, 0x00, payload_byte)
 
 class abluoEncoders:
     def __init__(self, i2cBus, i2cAddress, **kwargs):
@@ -31,12 +33,33 @@ class abluoEncoders:
         """
         self._i2cBus = i2cBus
         self._i2cAddress = i2cAddress
+        self.wire = smbus.SMBus(i2cBus)
+        time.sleep(1)
 
     def readEncoders(self):
-        with smbus.SMBus(self._i2cBus) as wire:
-            read = wire.read_i2c_block_data(self._i2cAddress, 0x00, 31)
+        read = self.wire.read_i2c_block_data(self._i2cAddress, 0x00, 31)
         spdbytes = list(read)
         spdstring = bytearray(spdbytes).decode("ascii")
         velocities = spdstring[1:].split(',')
-        velocities = [int(vel) for vel in velocities]
-        return velocities
+        try:
+            velocities = [int(vel) for vel in velocities]
+            return velocities
+        except:
+            return "NO DATA"
+
+if __name__ == "__main__":
+    wheels = abluoWheels(0, 112)
+    encoders = abluoEncoders(0, 112)
+    looping = True
+    i = 0
+    while looping:
+        print(i)
+        wheels.sendCommand([50, 50, 50, 50])
+        #time.sleep(0.01)
+        print(encoders.readEncoders())
+        time.sleep(0.01)
+        i+=1
+        if i == 100:
+            looping = False
+    wheels.sendCommand([0, 0, 0, 0])
+    #print(encoders.readEncoders())

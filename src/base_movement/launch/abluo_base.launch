@@ -4,11 +4,11 @@
         <param name="i2c/addr" type="int" value="112" />
     </node>
 
-    <!--node name="encoder_node" pkg="base_movement" type="encoder_node.py" output="screen">
+    <node name="encoder_node" pkg="base_movement" type="encoder_node.py" output="screen">
         <param name="i2c/bus" type="int" value="0" />
         <param name="i2c/addr" type="int" value="112" />
         <param name="freq" type="double" value="1.0" />
-    </node-->
+    </node>
 
     <node name="transform" pkg="base_movement" type="jointstate.py" output="screen">
         <param name="encoder/ticks_per_rev" type="int" value="328" />
