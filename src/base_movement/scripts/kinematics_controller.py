@@ -14,8 +14,8 @@ class VelocityController():
         rospy.sleep(0.1)
 
     def velocity2twist(self, dx, dy, dtheta, thetac):
-        H = np.array([[np.cos(thetac), np.sin(thetac), 0],
-                    [-np.sin(thetac), np.cos(thetac), 0],
+        H = np.array([[np.cos(thetac), -np.sin(thetac), 0],
+                    [np.sin(thetac), np.cos(thetac), 0],
                     [0, 0, 1]])
         velocity = np.array([dx, dy, dtheta])
         velocity.shape = (3, 1)
@@ -24,9 +24,9 @@ class VelocityController():
         return vx, vy, wz
 
     def twist2wheels(self, vx, vy, wz):
-        l = 0.163/2
-        w = 0.215/2
-        r = 0.08/2
+        l = WHEEL_SEPARATION_LENGTH / 2
+        w = WHEEL_SEPARATION_WIDTH / 2
+        r = WHEEL_RADIUS
         H = np.array([[1, -1, -w-l],
                     [1, 1, w+l],
                     [1, 1, -w-l],
@@ -39,8 +39,8 @@ class VelocityController():
     def move(self, dx, dy, dtheta, thetac):
         vx, vy, wz = self.velocity2twist(dx, dy, dtheta, thetac)
         u = self.twist2wheels(vx, vy, wz)
-        u = [i*5 for i in u]
-        print(u)
+        u = [sign(i) * 15 for i in u]
+        #print(u)
         msg = Float32MultiArray(data=u)
         self.vel_pub.publish(msg)
 
@@ -50,6 +50,7 @@ class VelocityController():
         not_moving_counter = 0
         thetag = math.radians(thetag_degrees)
         while rho > 0.05 or dtheta < -0.2 or dtheta > 0.2:
+            print(rho, dtheta)
             old_rho = rho
             old_dtheta = dtheta
             xc = odom.odom_pose['x']
@@ -86,7 +87,7 @@ class OdometryReader():
                                                                  msg.pose.pose.orientation.y,
                                                                  msg.pose.pose.orientation.z,
                                                                  msg.pose.pose.orientation.w])
-        print(self.odom_pose)
+        #print(self.odom_pose['theta'])
 
     def subscribe(self):
         self.odom_subscriber = rospy.Subscriber(
@@ -111,6 +112,11 @@ def sign(number):
 if __name__ == "__main__":
     try:
         rospy.init_node('kinematics_controller')
+
+        WHEEL_RADIUS = rospy.get_param("~wheel/diameter") / 2
+        WHEEL_SEPARATION_WIDTH = rospy.get_param("~wheel/separation/horizontal")
+        WHEEL_SEPARATION_LENGTH = rospy.get_param("~wheel/separation/vertical")
+
         velocity = VelocityController('/wheel_vel')
         odometry = OdometryReader('/odom')
 

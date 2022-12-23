@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-from std_msgs.msg import Int32MultiArray
+from std_msgs.msg import Float32MultiArray
 from abluo_sdk.abluo_sdk import abluoEncoders
 
 class EncoderROSWrapper:
@@ -12,12 +12,12 @@ class EncoderROSWrapper:
         encoder_i2c_bus = rospy.get_param("~i2c/bus")
         encoder_i2c_addr = rospy.get_param("~i2c/addr")
         self.encoders = abluoEncoders(encoder_i2c_bus, encoder_i2c_addr)
-        self.encoder_pub = rospy.Publisher("/encoder", Int32MultiArray, queue_size=10)
+        self.encoder_pub = rospy.Publisher("/encoder", Float32MultiArray, queue_size=10)
         rospy.Timer(rospy.Duration(1.0/encoder_freq), self.publish_encoder)
 
     def publish_encoder(self, event=None):
         try:
-            msg = Int32MultiArray(data=self.encoders.readEncoders())
+            msg = Float32MultiArray(data=self.encoders.readEncoders())
             self.encoder_pub.publish(msg)
         except Exception as e:
             print("Cannot read encoders. Check I2C connection.")

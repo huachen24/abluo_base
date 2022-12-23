@@ -40,26 +40,25 @@ class abluoEncoders:
         read = self.wire.read_i2c_block_data(self._i2cAddress, 0x00, 31)
         spdbytes = list(read)
         spdstring = bytearray(spdbytes).decode("ascii")
-        velocities = spdstring[1:].split(',')
+        velocities = spdstring.split(',')
         try:
-            velocities = [int(vel) for vel in velocities]
+            velocities = [float(vel) for vel in velocities]
             return velocities
         except:
+            print(velocities)
             return "NO DATA"
 
 if __name__ == "__main__":
-    wheels = abluoWheels(0, 112)
-    encoders = abluoEncoders(0, 112)
+    wheels = abluoWheels(8, 112)
+    encoders = abluoEncoders(8, 101)
     looping = True
     i = 0
     while looping:
         print(i)
-        wheels.sendCommand([50, 50, 50, 50])
-        #time.sleep(0.01)
+        wheels.sendCommand([-10, -10, -10, -10])
         print(encoders.readEncoders())
         time.sleep(0.01)
         i+=1
-        if i == 100:
+        if i == 50:
             looping = False
     wheels.sendCommand([0, 0, 0, 0])
-    #print(encoders.readEncoders())
