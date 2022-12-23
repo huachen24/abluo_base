@@ -39,8 +39,7 @@ class VelocityController():
     def move(self, dx, dy, dtheta, thetac):
         vx, vy, wz = self.velocity2twist(dx, dy, dtheta, thetac)
         u = self.twist2wheels(vx, vy, wz)
-        u = [sign(i) * 15 for i in u]
-        #print(u)
+        u = [calculate_pwm(i) for i in u]
         msg = Float32MultiArray(data=u)
         self.vel_pub.publish(msg)
 
@@ -49,8 +48,7 @@ class VelocityController():
         dtheta = 5.0
         not_moving_counter = 0
         thetag = math.radians(thetag_degrees)
-        while rho > 0.05 or dtheta < -0.2 or dtheta > 0.2:
-            print(rho, dtheta)
+        while rho > 0.05 or dtheta < -0.15 or dtheta > 0.15:
             old_rho = rho
             old_dtheta = dtheta
             xc = odom.odom_pose['x']
@@ -60,7 +58,10 @@ class VelocityController():
             dy = yg - yc
             rho = np.sqrt(dx**2 + dy**2)
             dtheta = normalize(thetag - thetac)
-            velocity.move(dx, dy, dtheta, thetac)
+            vx = sign(clamp_dist(dx)) * 0.08
+            vy = sign(clamp_dist(dy)) * 0.08
+            vtheta = sign(clamp_angle(dtheta)) * 0.2
+            velocity.move(vx, vy, vtheta, thetac)
             if old_rho == rho and old_dtheta == dtheta:
                 not_moving_counter += 1
             else: 
@@ -101,6 +102,18 @@ class OdometryReader():
 def normalize(angle):
     return np.arctan2(np.sin(angle), np.cos(angle))
 
+def clamp_dist(dist):
+    if -0.05 < dist < 0.05:
+        return 0
+    else:
+        return dist
+
+def clamp_angle(angle):
+    if -0.15 < angle < 0.15:
+        return 0
+    else:
+        return angle
+
 def sign(number):
     if number > 0:
         return 1
@@ -108,6 +121,11 @@ def sign(number):
         return -1
     else:
         return 0
+
+def calculate_pwm(vel):
+    if vel > 5:
+        vel = 5
+    return (vel * 2) + (15 * sign(vel))
 
 if __name__ == "__main__":
     try:
@@ -121,7 +139,7 @@ if __name__ == "__main__":
         odometry = OdometryReader('/odom')
 
         #testing waypoints
-        waypoints = [(0, 0, 90)]
+        waypoints = [(0.15, 0, 0)]
         i=0
 
         for xg, yg, thetag in waypoints:
@@ -134,7 +152,8 @@ if __name__ == "__main__":
 
         # Errors
         error = math.hypot(odometry.odom_pose['x'], odometry.odom_pose['y'])
-        print('Final positioning error is %.2fm' % error)
+        print('Final displacement is %.2fm' % error)
+        print('Final angle is %.2f' % odometry.odom_pose['theta'])
         #xs = [x[0] for x in odometry.trajectory]
         #ys = [x[1] for x in odometry.trajectory]
         #plt.plot(xs, ys)
