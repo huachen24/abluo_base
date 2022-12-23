@@ -135,7 +135,7 @@ def update(encoder):
     # From wheel velocities, compute base velocity by using the inverse kinematics
     vx = (v_front_left + v_front_right + v_rear_left + v_rear_right) * WHEEL_RADIUS / 4
     vy = (-v_front_left + v_front_right + v_rear_left - v_rear_right) * WHEEL_RADIUS / 4
-    vth = (-v_front_left + v_front_right - v_rear_left + v_rear_right) * WHEEL_RADIUS / (4 * (WHEEL_SEPARATION_WIDTH + WHEEL_SEPARATION_LENGTH))
+    vth = (-v_front_left + v_front_right - v_rear_left + v_rear_right) * WHEEL_RADIUS / (2 * (WHEEL_SEPARATION_WIDTH + WHEEL_SEPARATION_LENGTH))
 
     dt = (new_time - time).to_sec()
     delta_x = (vx * cos(th) - vy * sin(th)) * dt
