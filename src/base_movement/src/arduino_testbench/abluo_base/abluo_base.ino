@@ -16,8 +16,8 @@
 
 // Front Left Wheel - DC Controller 1 Motor 1
 #define FL_EN 54
-#define FL_IN1 56
-#define FL_IN2 55
+#define FL_IN1 55
+#define FL_IN2 56
 
 // Front Right Wheel - DC Controller 1 Motor 2
 #define FR_EN 57
@@ -37,17 +37,17 @@
 #define ESTOP_INT 10
 
 // Encoder input pins (only 1 needs to be interrupt)
-#define ENC_FL_A 3
-#define ENC_FL_B 2
+#define ENC_FL_A 2
+#define ENC_FL_B 3
 
-#define ENC_FR_A 4
-#define ENC_FR_B 5
+#define ENC_FR_A 5
+#define ENC_FR_B 4
 
-#define ENC_BL_A 7
-#define ENC_BL_B 6
+#define ENC_BL_A 6
+#define ENC_BL_B 7
 
-#define ENC_BR_A 8
-#define ENC_BR_B 9
+#define ENC_BR_A 9
+#define ENC_BR_B 8
 
 // Tick count for 1 rev
 #define ENC_FL_REV 8900
@@ -331,6 +331,10 @@ void handleCommand()
   int frDIR = 1;
   int blDIR = 1;
   int brDIR = 1;
+  int flStatus = 1;
+  int frStatus = 1;
+  int blStatus = 1;
+  int brStatus = 1;
   int flPWM = payload[0];
   int frPWM = payload[1];
   int blPWM = payload[2];
@@ -338,23 +342,31 @@ void handleCommand()
   if (flPWM < 0 ) {
     flDIR = 0;
     flPWM = -flPWM;
+  } else if (flPWM == 0) {
+    flStatus = 0;
   }
   if (frPWM < 0 ) {
     frDIR = 0;
     frPWM = -frPWM;
+  } else if (frPWM == 0) {
+    frStatus = 0;
   }
   if (blPWM < 0 ) {
     blDIR = 0;
     blPWM = -blPWM;
+  } else if (blPWM == 0) {
+    blStatus = 0;
   }
   if (brPWM < 0 ) {
     brDIR = 0;
     brPWM = -brPWM;
+  } else if (brPWM == 0) {
+    brStatus = 0;
   }
-  updateDcMotorState(WHEELS_INDEX::FRONT_LEFT, 1, flDIR, flPWM, set_FL_Forward, set_FL_Backward, brake_FL);
-  updateDcMotorState(WHEELS_INDEX::FRONT_RIGHT, 1, frDIR, frPWM, set_FR_Forward, set_FR_Backward, brake_FR);
-  updateDcMotorState(WHEELS_INDEX::BACK_LEFT, 1, blDIR, blPWM, set_BL_Forward, set_BL_Backward, brake_BL);
-  updateDcMotorState(WHEELS_INDEX::BACK_RIGHT, 1, brDIR, brPWM, set_BR_Forward, set_BR_Backward, brake_BR);
+  updateDcMotorState(WHEELS_INDEX::FRONT_LEFT, flStatus, flDIR, flPWM, set_FL_Forward, set_FL_Backward, brake_FL);
+  updateDcMotorState(WHEELS_INDEX::FRONT_RIGHT, frStatus, frDIR, frPWM, set_FR_Forward, set_FR_Backward, brake_FR);
+  updateDcMotorState(WHEELS_INDEX::BACK_LEFT, blStatus, blDIR, blPWM, set_BL_Forward, set_BL_Backward, brake_BL);
+  updateDcMotorState(WHEELS_INDEX::BACK_RIGHT, brStatus, brDIR, brPWM, set_BR_Forward, set_BR_Backward, brake_BR);
 }
 
 /**
@@ -419,6 +431,8 @@ void getEncoderData() {
 
 void requestEvent()
 {
+//  getEncoderData();
+//  Wire.write(speedChars, 32);
   dtostrf(posFL, 7, 0, padded_FL);
   strcat(speedChars, padded_FL);
   strcat(speedChars, ",");
@@ -496,21 +510,10 @@ void loop()
     {
       processNewData();
       pwmMotorsController.handlePWM();
-      // payload[0] = 30;
-      // payload[1] = 30;
-      // payload[2] = 30;
-      // payload[3] = 30;
-      // handleCommand();
-      // updateDcMotorState(WHEELS_INDEX::FRONT_LEFT, 1, 0, 50, set_FL_Forward, set_FL_Backward, brake_FL);
-      // updateDcMotorState(WHEELS_INDEX::FRONT_RIGHT, 1, 0, 50, set_FR_Forward, set_FR_Backward, brake_FR);
-      // updateDcMotorState(WHEELS_INDEX::BACK_LEFT, 1, 0, 50, set_BL_Forward, set_BL_Backward, brake_BL);
-      // updateDcMotorState(WHEELS_INDEX::BACK_RIGHT, 1, 0, 50, set_BR_Forward, set_BR_Backward, brake_BR);
-      // getEncoderData();
     }
     else
     {
       parseInput();
-      // getEncoderData();
     }
   }
 }
